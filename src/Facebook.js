@@ -8,16 +8,17 @@ const Facebook = () => {
   const [userData, setUserData] = useState({});
   const [clientBmSuToken, setClientBmSuToken] = useState('');
   const [sysUserId, setSysUserId] = useState('');
-  const [pageToken, setPageToken] = useState('');
+  const [pageToken, setPageToken] = useState([]);
 
   const clientBmId = '';
-  const clientPageId = '';
-
+  const clientPageId = ''; 
+  
   const partnerBmId = '';
   const partnerBmAdminSuToken = ``;
-  const clientSecret = ''; // app secret
+  // const clientSecret = ''; // app secret
   // const redirectUri = 'http%3A%2F%2Flocalhost%3A3000%2F'; // pre encoded
   const appId = ''; // client id
+  const appToken = '';
 
   // onclick function that came with FacebookLogin component
   const componentClicked = (response) => {
@@ -43,7 +44,7 @@ const Facebook = () => {
   // gets info on any tokens
   const getTokenInfo = async () => {
     const response = await axios({
-      url: `https://graph.facebook.com/debug_token?input_token=${userData.userToken}&access_token=${userData.userToken}`,
+      url: `https://graph.facebook.com/debug_token?input_token=${userData.userToken}&access_token=${appToken}`,
       method: 'get',
     });
     console.log('token info', response);
@@ -53,7 +54,7 @@ const Facebook = () => {
   // the partner (app creator) and client's Business Manager
   const createOnBehalfRelation = async () => {
     const response = await axios({
-      url: `https://graph.facebook.com/v6.0/${partnerBmId}/managed_businesses?existing_client_business_id=${clientBmId}&access_token=${userData.userToken}`,
+      url: `https://graph.facebook.com/v10.0/${partnerBmId}/managed_businesses?existing_client_business_id=${clientBmId}&access_token=${userData.userToken}`,
       method: 'post',
     });
     console.log('create On Behalf', response);
@@ -62,7 +63,7 @@ const Facebook = () => {
   // Step 3, fetch access token of system user under the client's Business Manager
   const getClientSysUserBm = async () => {
     const response = await axios({
-      url: `https://graph.facebook.com/v6.0/${clientBmId}/access_token?scope=business_management,pages_read_engagement,pages_read_user_content&app_id=<${appId}&access_token=${partnerBmAdminSuToken}`,
+      url: `https://graph.facebook.com/v10.0/${clientBmId}/access_token?scope=business_management,pages_show_list,pages_read_engagement,pages_read_user_content&app_id=${appId}&access_token=${partnerBmAdminSuToken}`,
       method: 'post',
     });
     setClientBmSuToken(response.data.access_token)
@@ -72,7 +73,7 @@ const Facebook = () => {
   // Step 4, get the ID of the system user
   const getSysUserId = async () => {
     const response = await axios({
-      url: `https://graph.facebook.com/v6.0/me?access_token=${clientBmSuToken}`,
+      url: `https://graph.facebook.com/v10.0/me?access_token=${clientBmSuToken}`,
       method: 'get',
     });
     setSysUserId(response.data.id);
@@ -82,7 +83,7 @@ const Facebook = () => {
   // Step 5, Assign assets (page) to the system user in the client's Business Manager
   const assignSuAssets = async () => {
     const response = await axios({
-      url: `https://graph.facebook.com/v6.0/${clientPageId}/assigned_users?user=${sysUserId}&tasks=MANAGE&access_token=${userData.accessToken}`,
+      url: `https://graph.facebook.com/v10.0/${clientPageId}/assigned_users?user=${sysUserId}&tasks=MANAGE&access_token=${userData.userToken}`,
       method: 'post',
     });
     console.log('Assign SU Assets', response);
@@ -94,11 +95,11 @@ const Facebook = () => {
   // Step 7, Generate a Page Access Token using CLIENT_BM_SU_ACCESS_TOKEN (clientBmSuToken)
   const getPageToken = async () => {
     const response = await axios({
-      url: `https://graph.facebook.com/v6.0/me/accounts?access_token=${clientBmSuToken}`,
+      url: `https://graph.facebook.com/v10.0/me/accounts?access_token=${clientBmSuToken}`,
       method: 'get',
     });
-    setPageToken(response.data[0].access_token);
-    console.log('Page Token Res', response);
+    setPageToken(response.data);
+    console.log('Page Token Res', response.data);
   };
 
   // graph api query to get the users name
@@ -128,6 +129,8 @@ const Facebook = () => {
   // };
 
   console.log('user data', userData);
+  console.log('client sys user id', sysUserId);
+  console.log('client sys user token', clientBmSuToken);
   console.log('page token', pageToken);
 
   return(
@@ -140,7 +143,6 @@ const Facebook = () => {
             <br />
             <button onClick={() => getTokenInfo()}>Get Token info</button><br /><br />
             <button onClick={() => createOnBehalfRelation()}>Create On Behalf Relationship</button><br /><br />
-            <button onClick={() => createOnBehalfRelation()}>Create Client BM SU Access Token</button><br /><br />
             <button onClick={() => getClientSysUserBm()}>Get Client BM SU Access Token</button><br /><br />
             <button onClick={() => getSysUserId()}>Get System User ID</button><br /><br />
             <button onClick={() => assignSuAssets()}>Assign System User Page</button><br /><br />
@@ -154,7 +156,7 @@ const Facebook = () => {
             appId={appId}
             autoLoad={false}
             fields="name,email,picture"
-            scope="business_management,pages_read_engagement,pages_read_user_content"
+            scope="business_management,pages_show_list,pages_read_engagement,pages_read_user_content"
             onClick={componentClicked}
             callback={responseFacebook}
           />
