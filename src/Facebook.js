@@ -158,7 +158,7 @@ const Facebook = () => {
 
   return(
     <div>
-      Facebook Login
+      <h2>Facebook Login</h2><br />
       <div>
         {isLoggedIn ? 
           <div>
@@ -166,12 +166,14 @@ const Facebook = () => {
             <br />
             <button onClick={() => getTokenInfo()}>Get Token info</button><br /><br />
             <button onClick={() => getLongLiveToken()}>Get Long Live Token</button><br /><br />
-            <h2>Start of On Behalf of Flow</h2>
-            <button onClick={() => createOnBehalfRelation()}>Create On Behalf Relationship</button><br /><br />
-            <button onClick={() => getClientSysUserBm()}>Get Client BM SU Access Token</button><br /><br />
-            <button onClick={() => getSysUserId()}>Get System User ID</button><br /><br />
-            <button onClick={() => assignSuAssets()}>Assign System User Page</button><br /><br />
-            <button onClick={() => getPageToken()}>Get Page Token</button><br /><br />
+            <h2>Start of Business Management On Behalf Of Flow</h2>
+            <h4>1. Login (already done if you are seeing this)</h4>
+            <button onClick={() => createOnBehalfRelation()}>2. Create On Behalf Relationship</button><br /><br />
+            <button onClick={() => getClientSysUserBm()}>3. Get Client BM SU Access Token</button><br /><br />
+            <button onClick={() => getSysUserId()}>4. Get System User ID</button><br /><br />
+            <button onClick={() => assignSuAssets()}>5. Assign System User Page</button><br />
+            <h4>6. Store page token in database for server use</h4>
+            <button onClick={() => getPageToken()}>7.Get Page Token</button><br /><br />
             {/* <h2>Sample Graph API Queries</h2> */}
             {/* <button onClick={() => getName()}>Get User Name</button><br /><br /> */}
             {/* <button onClick={() => getPosts()}>Get User Posts</button><br /><br /> */}
